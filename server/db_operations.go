@@ -1,0 +1,62 @@
+package main
+
+import (
+	"database/sql"
+	_ "embed"
+	"time"
+
+	"github.com/google/uuid"
+)
+
+type Implant struct {
+	ID        uuid.UUID
+	LastSeen  time.Time
+	CreatedAt time.Time
+}
+
+//go:embed schema.sql
+var createTableSQL string
+
+func createTables(db *sql.DB) error {
+	_, err := db.Exec(createTableSQL)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func insertImplant(db *sql.DB, id uuid.UUID, lastSeen, createdAt time.Time) error {
+	_, err := db.Exec(
+		"INSERT INTO implants VALUES (?, ?, ?)",
+		id, lastSeen, createdAt,
+	)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func listImplants(db *sql.DB) ([]Implant, error) {
+	implants := make([]Implant, 0)
+
+	rows, err := db.Query("SELECT id, last_seen, created_at FROM implants")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var implant Implant
+
+		if err := rows.Scan(&implant.ID, &implant.LastSeen, &implant.CreatedAt); err != nil {
+			return nil, err
+		}
+		implants = append(implants, implant)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return implants, nil
+}
