@@ -32,17 +32,13 @@ func main() {
 	defer conn.Close()
 	client = grpcapi.NewAdminClient(conn)
 	var cmd = new(grpcapi.Command)
-	cmd.In = os.Args[1]
 	ctx := context.Background()
 
 	cmdFlags := &cli.Command{
 		Commands: []*cli.Command{
 			{
-				Flags: []cli.Flag{
-					&cli.BoolFlag{
-						Name: "list",
-					},
-				},
+				Name:  "list",
+				Usage: "List implants",
 				Action: func(ctx context.Context, c *cli.Command) error {
 					req := &grpcapi.Empty{}
 					implantsList, err := client.ListRegisteredImplants(ctx, req)
@@ -60,27 +56,18 @@ func main() {
 				},
 			},
 		},
-	}
 
-	if cmd.In == "list" {
-		req := &grpcapi.Empty{}
-		implantsList, err := client.ListRegisteredImplants(ctx, req)
-		if err != nil {
-			log.Fatal(err)
-		}
-		if len(implantsList.Implants) == 0 {
-			fmt.Println("No implants")
-			return
-		}
-		for _, implant := range implantsList.Implants {
-			fmt.Printf("%s - %s\n", implant.Id, implant.IpAddress)
-		}
-	} else {
-		cmd, err = client.RunCommand(ctx, cmd)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(cmd.Out)
+		// Run command
+		Action: func(ctx context.Context, c *cli.Command) error {
+			cmd.In = os.Args[1]
+			cmd, err = client.RunCommand(ctx, cmd)
+			if err != nil {
+				return err
+			}
+			fmt.Println(cmd.Out)
+
+			return nil
+		},
 	}
 
 	if err := cmdFlags.Run(ctx, os.Args); err != nil {
