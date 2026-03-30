@@ -9,7 +9,6 @@ import (
 
 	"github.com/urfave/cli/v3"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 func main() {
@@ -20,7 +19,7 @@ func main() {
 		client grpcapi.AdminClient
 	)
 
-	creds, err := credentials.NewClientTLSFromFile("server.crt", "")
+	creds, err := loadTLSClientCreds()
 	if err != nil {
 		log.Fatalln(err)
 	}

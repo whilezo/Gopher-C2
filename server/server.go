@@ -135,11 +135,17 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	creds, err := credentials.NewServerTLSFromFile("server.crt", "server.key")
+	implantCreds, err := credentials.NewServerTLSFromFile("server.crt", "server.key")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	opts = append(opts, grpc.Creds(creds))
+	implantOpts := append(opts, grpc.Creds(implantCreds))
+
+	clientCreds, err := loadTLSServerCreds()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	clientOpts := append(opts, grpc.Creds(clientCreds))
 
 	work, output = make(chan *grpcapi.Command), make(chan *grpcapi.Command)
 	implants := make(map[uuid.UUID]time.Time)
@@ -153,7 +159,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	grpcAdminServer, grpcImplantServer := grpc.NewServer(opts...), grpc.NewServer(opts...)
+	grpcAdminServer, grpcImplantServer := grpc.NewServer(clientOpts...), grpc.NewServer(implantOpts...)
 	grpcapi.RegisterImplantServer(grpcImplantServer, implant)
 	grpcapi.RegisterAdminServer(grpcAdminServer, admin)
 
