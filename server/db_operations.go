@@ -60,3 +60,15 @@ func listImplants(db *sql.DB) ([]Implant, error) {
 
 	return implants, nil
 }
+
+func updateLastSeen(db *sql.DB, implantId string) error {
+	_, err := db.Exec(
+		"UPDATE implants SET last_seen = ? WHERE id = ?",
+		time.Now(), implantId,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

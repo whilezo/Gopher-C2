@@ -13,7 +13,10 @@ import (
 	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 )
 
 const banner = `
@@ -59,6 +62,14 @@ func NewAdminServer(work, output chan *grpcapi.Command, implants map[uuid.UUID]t
 }
 
 func (s *implantServer) FetchCommand(ctx context.Context, empty *grpcapi.Empty) (*grpcapi.Command, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, "no metadata provided")
+	}
+
+	id := md["implant-id"][0]
+	updateLastSeen(s.db, id)
+
 	var cmd = new(grpcapi.Command)
 	select {
 	case cmd, ok := <-s.work:

