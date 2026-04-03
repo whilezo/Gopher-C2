@@ -89,12 +89,15 @@ func (s *implantServer) SendOutput(ctx context.Context, result *grpcapi.Command)
 }
 
 func (s *implantServer) RegisterNewImplant(ctx context.Context, empty *grpcapi.Empty) (*grpcapi.RegisterResponse, error) {
+	ipAddress := getClientIP(ctx)
+
 	implantId, err := uuid.NewUUID()
 	if err != nil {
 		return nil, err
 	}
 	s.implants[implantId] = time.Now()
-	insertImplant(s.db, implantId, time.Now(), time.Now())
+
+	insertImplant(s.db, implantId, ipAddress, time.Now(), time.Now())
 
 	response := grpcapi.RegisterResponse{
 		Id: implantId.String(),
@@ -116,12 +119,24 @@ func (s *adminServer) ListRegisteredImplants(ctx context.Context, empty *grpcapi
 	if err != nil {
 		return nil, err
 	}
+
 	response := grpcapi.ImplantsList{}
+	now := time.Now()
+
+	// Threshold determines whether implant is online or offline
+	threshold := 30 * time.Second
+
 	for _, implant := range implants {
-		readableTime := implant.LastSeen.Format("2006-01-02 15:04:05")
+		status := "ONLINE"
+		if now.Sub(implant.LastSeen) > threshold {
+			status = "OFFLINE"
+		}
+
 		data := &grpcapi.ImplantData{
 			Id:        implant.ID.String(),
-			IpAddress: readableTime,
+			IpAddress: implant.IpAddress,
+			LastSeen:  implant.LastSeen.String(),
+			Status:    status,
 		}
 		response.Implants = append(response.Implants, data)
 	}

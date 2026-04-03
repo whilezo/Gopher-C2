@@ -10,6 +10,7 @@ import (
 
 type Implant struct {
 	ID        uuid.UUID
+	IpAddress string
 	LastSeen  time.Time
 	CreatedAt time.Time
 }
@@ -25,10 +26,10 @@ func createTables(db *sql.DB) error {
 	return nil
 }
 
-func insertImplant(db *sql.DB, id uuid.UUID, lastSeen, createdAt time.Time) error {
+func insertImplant(db *sql.DB, id uuid.UUID, ipAddress string, lastSeen, createdAt time.Time) error {
 	_, err := db.Exec(
-		"INSERT INTO implants VALUES (?, ?, ?)",
-		id, lastSeen, createdAt,
+		"INSERT INTO implants VALUES (?, ?, ?, ?)",
+		id, ipAddress, lastSeen, createdAt,
 	)
 	if err != nil {
 		return err
@@ -39,7 +40,7 @@ func insertImplant(db *sql.DB, id uuid.UUID, lastSeen, createdAt time.Time) erro
 func listImplants(db *sql.DB) ([]Implant, error) {
 	implants := make([]Implant, 0)
 
-	rows, err := db.Query("SELECT id, last_seen, created_at FROM implants")
+	rows, err := db.Query("SELECT id, ip_address, last_seen, created_at FROM implants")
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +49,7 @@ func listImplants(db *sql.DB) ([]Implant, error) {
 	for rows.Next() {
 		var implant Implant
 
-		if err := rows.Scan(&implant.ID, &implant.LastSeen, &implant.CreatedAt); err != nil {
+		if err := rows.Scan(&implant.ID, &implant.IpAddress, &implant.LastSeen, &implant.CreatedAt); err != nil {
 			return nil, err
 		}
 		implants = append(implants, implant)

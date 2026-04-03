@@ -2,6 +2,10 @@
 SERVER_NAME=server
 CLIENT_NAME=client
 DAYS_VALID=365
+PROTO_DIR=grpcapi
+PROTO_FILE=$(PROTO_DIR)/implant.proto
+PB_OUT=grpcapi
+
 
 .PHONY: all cert server-cert client-cert clean help
 
@@ -26,6 +30,16 @@ server-cert:
 ## client-cert: Generates the self-signed client certificate
 client-cert:
 	$(call gen_cert,$(CLIENT_NAME),grpc-client,)
+
+## proto: Compiles the protobuf files for Go and gRPC
+proto:
+	@echo "Compiling protobuf..."
+	mkdir -p $(PB_OUT)
+	protoc --proto_path=$(PROTO_DIR) \
+		--go_out=$(PB_OUT) --go_opt=paths=source_relative \
+		--go-grpc_out=$(PB_OUT) --go-grpc_opt=paths=source_relative \
+		$(PROTO_FILE)
+	@echo "Done: Protobuf compiled to $(PB_OUT)"
 
 ## clean: Removes all generated certificate and key files
 clean:

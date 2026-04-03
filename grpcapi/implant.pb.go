@@ -113,6 +113,8 @@ type ImplantData struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	IpAddress     string                 `protobuf:"bytes,2,opt,name=ip_address,json=ipAddress,proto3" json:"ip_address,omitempty"`
+	LastSeen      string                 `protobuf:"bytes,3,opt,name=last_seen,json=lastSeen,proto3" json:"last_seen,omitempty"`
+	Status        string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -157,6 +159,20 @@ func (x *ImplantData) GetId() string {
 func (x *ImplantData) GetIpAddress() string {
 	if x != nil {
 		return x.IpAddress
+	}
+	return ""
+}
+
+func (x *ImplantData) GetLastSeen() string {
+	if x != nil {
+		return x.LastSeen
+	}
+	return ""
+}
+
+func (x *ImplantData) GetStatus() string {
+	if x != nil {
+		return x.Status
 	}
 	return ""
 }
@@ -257,11 +273,13 @@ const file_implant_proto_rawDesc = "" +
 	"\aCommand\x12\x0e\n" +
 	"\x02In\x18\x01 \x01(\tR\x02In\x12\x10\n" +
 	"\x03Out\x18\x02 \x01(\tR\x03Out\"\a\n" +
-	"\x05Empty\"<\n" +
+	"\x05Empty\"q\n" +
 	"\vImplantData\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
-	"ip_address\x18\x02 \x01(\tR\tipAddress\"@\n" +
+	"ip_address\x18\x02 \x01(\tR\tipAddress\x12\x1b\n" +
+	"\tlast_seen\x18\x03 \x01(\tR\blastSeen\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\tR\x06status\"@\n" +
 	"\fImplantsList\x120\n" +
 	"\bimplants\x18\x01 \x03(\v2\x14.grpcapi.ImplantDataR\bimplants\"\"\n" +
 	"\x10RegisterResponse\x12\x0e\n" +

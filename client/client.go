@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"text/tabwriter"
 
 	"github.com/urfave/cli/v3"
 	"google.golang.org/grpc"
@@ -48,9 +49,21 @@ func main() {
 						fmt.Println("No implants")
 						return nil
 					}
+					w := tabwriter.NewWriter(os.Stdout, 0, 8, 2, ' ', tabwriter.Debug)
+					fmt.Fprintln(w, "ID\tIP ADDRESS\tLAST SEEN\tSTATUS")
+
 					for _, implant := range implantsList.Implants {
-						fmt.Printf("%s - %s\n", implant.Id, implant.IpAddress)
+						fmt.Fprintf(w, "%s\t%s\t%s\t%s\n",
+							implant.Id,
+							implant.IpAddress,
+							implant.LastSeen,
+							implant.Status,
+						)
 					}
+
+					// 3. Flush to the terminal
+					w.Flush()
+
 					return nil
 				},
 			},

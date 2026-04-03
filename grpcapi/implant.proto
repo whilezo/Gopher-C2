@@ -23,6 +23,8 @@ message Empty {}
 message ImplantData {
     string id = 1;
     string ip_address = 2;
+    string last_seen = 3;
+    string status = 4;
 }
 
 message ImplantsList {
