@@ -21,17 +21,62 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type DeleteRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteRequest) Reset() {
+	*x = DeleteRequest{}
+	mi := &file_implant_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteRequest) ProtoMessage() {}
+
+func (x *DeleteRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_implant_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteRequest.ProtoReflect.Descriptor instead.
+func (*DeleteRequest) Descriptor() ([]byte, []int) {
+	return file_implant_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *DeleteRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
 type Command struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	In            string                 `protobuf:"bytes,1,opt,name=In,proto3" json:"In,omitempty"`
-	Out           string                 `protobuf:"bytes,2,opt,name=Out,proto3" json:"Out,omitempty"`
+	In            string                 `protobuf:"bytes,1,opt,name=in,proto3" json:"in,omitempty"`
+	Out           string                 `protobuf:"bytes,2,opt,name=out,proto3" json:"out,omitempty"`
+	IsKill        bool                   `protobuf:"varint,3,opt,name=is_kill,json=isKill,proto3" json:"is_kill,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Command) Reset() {
 	*x = Command{}
-	mi := &file_implant_proto_msgTypes[0]
+	mi := &file_implant_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -43,7 +88,7 @@ func (x *Command) String() string {
 func (*Command) ProtoMessage() {}
 
 func (x *Command) ProtoReflect() protoreflect.Message {
-	mi := &file_implant_proto_msgTypes[0]
+	mi := &file_implant_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -56,7 +101,7 @@ func (x *Command) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Command.ProtoReflect.Descriptor instead.
 func (*Command) Descriptor() ([]byte, []int) {
-	return file_implant_proto_rawDescGZIP(), []int{0}
+	return file_implant_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Command) GetIn() string {
@@ -73,6 +118,13 @@ func (x *Command) GetOut() string {
 	return ""
 }
 
+func (x *Command) GetIsKill() bool {
+	if x != nil {
+		return x.IsKill
+	}
+	return false
+}
+
 type Empty struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -81,7 +133,7 @@ type Empty struct {
 
 func (x *Empty) Reset() {
 	*x = Empty{}
-	mi := &file_implant_proto_msgTypes[1]
+	mi := &file_implant_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -93,7 +145,7 @@ func (x *Empty) String() string {
 func (*Empty) ProtoMessage() {}
 
 func (x *Empty) ProtoReflect() protoreflect.Message {
-	mi := &file_implant_proto_msgTypes[1]
+	mi := &file_implant_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -106,7 +158,7 @@ func (x *Empty) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Empty.ProtoReflect.Descriptor instead.
 func (*Empty) Descriptor() ([]byte, []int) {
-	return file_implant_proto_rawDescGZIP(), []int{1}
+	return file_implant_proto_rawDescGZIP(), []int{2}
 }
 
 type ImplantData struct {
@@ -121,7 +173,7 @@ type ImplantData struct {
 
 func (x *ImplantData) Reset() {
 	*x = ImplantData{}
-	mi := &file_implant_proto_msgTypes[2]
+	mi := &file_implant_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -133,7 +185,7 @@ func (x *ImplantData) String() string {
 func (*ImplantData) ProtoMessage() {}
 
 func (x *ImplantData) ProtoReflect() protoreflect.Message {
-	mi := &file_implant_proto_msgTypes[2]
+	mi := &file_implant_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -146,7 +198,7 @@ func (x *ImplantData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ImplantData.ProtoReflect.Descriptor instead.
 func (*ImplantData) Descriptor() ([]byte, []int) {
-	return file_implant_proto_rawDescGZIP(), []int{2}
+	return file_implant_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ImplantData) GetId() string {
@@ -186,7 +238,7 @@ type ImplantsList struct {
 
 func (x *ImplantsList) Reset() {
 	*x = ImplantsList{}
-	mi := &file_implant_proto_msgTypes[3]
+	mi := &file_implant_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -198,7 +250,7 @@ func (x *ImplantsList) String() string {
 func (*ImplantsList) ProtoMessage() {}
 
 func (x *ImplantsList) ProtoReflect() protoreflect.Message {
-	mi := &file_implant_proto_msgTypes[3]
+	mi := &file_implant_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -211,7 +263,7 @@ func (x *ImplantsList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ImplantsList.ProtoReflect.Descriptor instead.
 func (*ImplantsList) Descriptor() ([]byte, []int) {
-	return file_implant_proto_rawDescGZIP(), []int{3}
+	return file_implant_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ImplantsList) GetImplants() []*ImplantData {
@@ -230,7 +282,7 @@ type RegisterResponse struct {
 
 func (x *RegisterResponse) Reset() {
 	*x = RegisterResponse{}
-	mi := &file_implant_proto_msgTypes[4]
+	mi := &file_implant_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -242,7 +294,7 @@ func (x *RegisterResponse) String() string {
 func (*RegisterResponse) ProtoMessage() {}
 
 func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_implant_proto_msgTypes[4]
+	mi := &file_implant_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -255,7 +307,7 @@ func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterResponse.ProtoReflect.Descriptor instead.
 func (*RegisterResponse) Descriptor() ([]byte, []int) {
-	return file_implant_proto_rawDescGZIP(), []int{4}
+	return file_implant_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *RegisterResponse) GetId() string {
@@ -269,10 +321,13 @@ var File_implant_proto protoreflect.FileDescriptor
 
 const file_implant_proto_rawDesc = "" +
 	"\n" +
-	"\rimplant.proto\x12\agrpcapi\"+\n" +
+	"\rimplant.proto\x12\agrpcapi\"\x1f\n" +
+	"\rDeleteRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"D\n" +
 	"\aCommand\x12\x0e\n" +
-	"\x02In\x18\x01 \x01(\tR\x02In\x12\x10\n" +
-	"\x03Out\x18\x02 \x01(\tR\x03Out\"\a\n" +
+	"\x02in\x18\x01 \x01(\tR\x02in\x12\x10\n" +
+	"\x03out\x18\x02 \x01(\tR\x03out\x12\x17\n" +
+	"\ais_kill\x18\x03 \x01(\bR\x06isKill\"\a\n" +
 	"\x05Empty\"q\n" +
 	"\vImplantData\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
@@ -288,11 +343,12 @@ const file_implant_proto_rawDesc = "" +
 	"\fFetchCommand\x12\x0e.grpcapi.Empty\x1a\x10.grpcapi.Command\x12.\n" +
 	"\n" +
 	"SendOutput\x12\x10.grpcapi.Command\x1a\x0e.grpcapi.Empty\x12?\n" +
-	"\x12RegisterNewImplant\x12\x0e.grpcapi.Empty\x1a\x19.grpcapi.RegisterResponse2z\n" +
+	"\x12RegisterNewImplant\x12\x0e.grpcapi.Empty\x1a\x19.grpcapi.RegisterResponse2\xb3\x01\n" +
 	"\x05Admin\x120\n" +
 	"\n" +
 	"RunCommand\x12\x10.grpcapi.Command\x1a\x10.grpcapi.Command\x12?\n" +
-	"\x16ListRegisteredImplants\x12\x0e.grpcapi.Empty\x1a\x15.grpcapi.ImplantsListB\fZ\n" +
+	"\x16ListRegisteredImplants\x12\x0e.grpcapi.Empty\x1a\x15.grpcapi.ImplantsList\x127\n" +
+	"\rDeleteImplant\x12\x16.grpcapi.DeleteRequest\x1a\x0e.grpcapi.EmptyB\fZ\n" +
 	"./;grpcapib\x06proto3"
 
 var (
@@ -307,28 +363,31 @@ func file_implant_proto_rawDescGZIP() []byte {
 	return file_implant_proto_rawDescData
 }
 
-var file_implant_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_implant_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_implant_proto_goTypes = []any{
-	(*Command)(nil),          // 0: grpcapi.Command
-	(*Empty)(nil),            // 1: grpcapi.Empty
-	(*ImplantData)(nil),      // 2: grpcapi.ImplantData
-	(*ImplantsList)(nil),     // 3: grpcapi.ImplantsList
-	(*RegisterResponse)(nil), // 4: grpcapi.RegisterResponse
+	(*DeleteRequest)(nil),    // 0: grpcapi.DeleteRequest
+	(*Command)(nil),          // 1: grpcapi.Command
+	(*Empty)(nil),            // 2: grpcapi.Empty
+	(*ImplantData)(nil),      // 3: grpcapi.ImplantData
+	(*ImplantsList)(nil),     // 4: grpcapi.ImplantsList
+	(*RegisterResponse)(nil), // 5: grpcapi.RegisterResponse
 }
 var file_implant_proto_depIdxs = []int32{
-	2, // 0: grpcapi.ImplantsList.implants:type_name -> grpcapi.ImplantData
-	1, // 1: grpcapi.Implant.FetchCommand:input_type -> grpcapi.Empty
-	0, // 2: grpcapi.Implant.SendOutput:input_type -> grpcapi.Command
-	1, // 3: grpcapi.Implant.RegisterNewImplant:input_type -> grpcapi.Empty
-	0, // 4: grpcapi.Admin.RunCommand:input_type -> grpcapi.Command
-	1, // 5: grpcapi.Admin.ListRegisteredImplants:input_type -> grpcapi.Empty
-	0, // 6: grpcapi.Implant.FetchCommand:output_type -> grpcapi.Command
-	1, // 7: grpcapi.Implant.SendOutput:output_type -> grpcapi.Empty
-	4, // 8: grpcapi.Implant.RegisterNewImplant:output_type -> grpcapi.RegisterResponse
-	0, // 9: grpcapi.Admin.RunCommand:output_type -> grpcapi.Command
-	3, // 10: grpcapi.Admin.ListRegisteredImplants:output_type -> grpcapi.ImplantsList
-	6, // [6:11] is the sub-list for method output_type
-	1, // [1:6] is the sub-list for method input_type
+	3, // 0: grpcapi.ImplantsList.implants:type_name -> grpcapi.ImplantData
+	2, // 1: grpcapi.Implant.FetchCommand:input_type -> grpcapi.Empty
+	1, // 2: grpcapi.Implant.SendOutput:input_type -> grpcapi.Command
+	2, // 3: grpcapi.Implant.RegisterNewImplant:input_type -> grpcapi.Empty
+	1, // 4: grpcapi.Admin.RunCommand:input_type -> grpcapi.Command
+	2, // 5: grpcapi.Admin.ListRegisteredImplants:input_type -> grpcapi.Empty
+	0, // 6: grpcapi.Admin.DeleteImplant:input_type -> grpcapi.DeleteRequest
+	1, // 7: grpcapi.Implant.FetchCommand:output_type -> grpcapi.Command
+	2, // 8: grpcapi.Implant.SendOutput:output_type -> grpcapi.Empty
+	5, // 9: grpcapi.Implant.RegisterNewImplant:output_type -> grpcapi.RegisterResponse
+	1, // 10: grpcapi.Admin.RunCommand:output_type -> grpcapi.Command
+	4, // 11: grpcapi.Admin.ListRegisteredImplants:output_type -> grpcapi.ImplantsList
+	2, // 12: grpcapi.Admin.DeleteImplant:output_type -> grpcapi.Empty
+	7, // [7:13] is the sub-list for method output_type
+	1, // [1:7] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -345,7 +404,7 @@ func file_implant_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_implant_proto_rawDesc), len(file_implant_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   2,
 		},

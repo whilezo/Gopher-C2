@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -67,6 +68,11 @@ func main() {
 			time.Sleep(5 * time.Second)
 			continue
 		}
+
+		if cmd.IsKill {
+			os.Exit(0)
+		}
+
 		if cmd.In == "" {
 			// No work
 			time.Sleep(3 * time.Second)

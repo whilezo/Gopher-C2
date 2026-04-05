@@ -199,6 +199,7 @@ var Implant_ServiceDesc = grpc.ServiceDesc{
 const (
 	Admin_RunCommand_FullMethodName             = "/grpcapi.Admin/RunCommand"
 	Admin_ListRegisteredImplants_FullMethodName = "/grpcapi.Admin/ListRegisteredImplants"
+	Admin_DeleteImplant_FullMethodName          = "/grpcapi.Admin/DeleteImplant"
 )
 
 // AdminClient is the client API for Admin service.
@@ -207,6 +208,7 @@ const (
 type AdminClient interface {
 	RunCommand(ctx context.Context, in *Command, opts ...grpc.CallOption) (*Command, error)
 	ListRegisteredImplants(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ImplantsList, error)
+	DeleteImplant(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type adminClient struct {
@@ -237,12 +239,23 @@ func (c *adminClient) ListRegisteredImplants(ctx context.Context, in *Empty, opt
 	return out, nil
 }
 
+func (c *adminClient) DeleteImplant(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Admin_DeleteImplant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AdminServer is the server API for Admin service.
 // All implementations must embed UnimplementedAdminServer
 // for forward compatibility.
 type AdminServer interface {
 	RunCommand(context.Context, *Command) (*Command, error)
 	ListRegisteredImplants(context.Context, *Empty) (*ImplantsList, error)
+	DeleteImplant(context.Context, *DeleteRequest) (*Empty, error)
 	mustEmbedUnimplementedAdminServer()
 }
 
@@ -258,6 +271,9 @@ func (UnimplementedAdminServer) RunCommand(context.Context, *Command) (*Command,
 }
 func (UnimplementedAdminServer) ListRegisteredImplants(context.Context, *Empty) (*ImplantsList, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListRegisteredImplants not implemented")
+}
+func (UnimplementedAdminServer) DeleteImplant(context.Context, *DeleteRequest) (*Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteImplant not implemented")
 }
 func (UnimplementedAdminServer) mustEmbedUnimplementedAdminServer() {}
 func (UnimplementedAdminServer) testEmbeddedByValue()               {}
@@ -316,6 +332,24 @@ func _Admin_ListRegisteredImplants_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Admin_DeleteImplant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).DeleteImplant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Admin_DeleteImplant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).DeleteImplant(ctx, req.(*DeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Admin_ServiceDesc is the grpc.ServiceDesc for Admin service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -330,6 +364,10 @@ var Admin_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListRegisteredImplants",
 			Handler:    _Admin_ListRegisteredImplants_Handler,
+		},
+		{
+			MethodName: "DeleteImplant",
+			Handler:    _Admin_DeleteImplant_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

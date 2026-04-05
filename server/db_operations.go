@@ -73,3 +73,15 @@ func updateLastSeen(db *sql.DB, implantId string) error {
 
 	return nil
 }
+
+func deleteImplant(db *sql.DB, implantId string) error {
+	_, err := db.Exec(
+		"DELETE FROM implants WHERE id = ?",
+		implantId,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

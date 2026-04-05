@@ -143,6 +143,21 @@ func (s *adminServer) ListRegisteredImplants(ctx context.Context, empty *grpcapi
 	return &response, nil
 }
 
+func (s *adminServer) DeleteImplant(ctx context.Context, deleteRequest *grpcapi.DeleteRequest) (*grpcapi.Empty, error) {
+	killCmd := &grpcapi.Command{
+		IsKill: true,
+	}
+
+	s.work <- killCmd
+
+	err := deleteImplant(s.db, deleteRequest.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &grpcapi.Empty{}, nil
+}
+
 func main() {
 	var (
 		implantListener, adminListener net.Listener

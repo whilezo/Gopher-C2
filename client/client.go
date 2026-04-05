@@ -67,6 +67,27 @@ func main() {
 					return nil
 				},
 			},
+			{
+				Name:      "delete",
+				Usage:     "Remove an implant from the server",
+				ArgsUsage: "[implant-id]",
+				Action: func(ctx context.Context, c *cli.Command) error {
+					if c.Args().Len() < 1 {
+						return fmt.Errorf("error: you must provide an implant ID")
+					}
+					id := c.Args().First()
+
+					deleteRequest := &grpcapi.DeleteRequest{
+						Id: id,
+					}
+					_, err := client.DeleteImplant(ctx, deleteRequest)
+					if err != nil {
+						return err
+					}
+
+					return nil
+				},
+			},
 		},
 
 		// Run command

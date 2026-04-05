@@ -11,11 +11,17 @@ service Implant {
 service Admin {
     rpc RunCommand (Command) returns (Command);
     rpc ListRegisteredImplants (Empty) returns (ImplantsList);
+    rpc DeleteImplant(DeleteRequest) returns (Empty);
+}
+
+message DeleteRequest {
+    string id = 1;
 }
 
 message Command {
-    string In = 1;
-    string Out = 2;
+    string in = 1;
+    string out = 2;
+    bool is_kill = 3;
 }
 
 message Empty {}
