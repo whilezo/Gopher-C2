@@ -67,9 +67,10 @@ func (x *DeleteRequest) GetId() string {
 
 type Command struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	In            string                 `protobuf:"bytes,1,opt,name=in,proto3" json:"in,omitempty"`
-	Out           string                 `protobuf:"bytes,2,opt,name=out,proto3" json:"out,omitempty"`
-	IsKill        bool                   `protobuf:"varint,3,opt,name=is_kill,json=isKill,proto3" json:"is_kill,omitempty"`
+	ImplantId     string                 `protobuf:"bytes,1,opt,name=implant_id,json=implantId,proto3" json:"implant_id,omitempty"`
+	In            string                 `protobuf:"bytes,2,opt,name=in,proto3" json:"in,omitempty"`
+	Out           string                 `protobuf:"bytes,3,opt,name=out,proto3" json:"out,omitempty"`
+	IsKill        bool                   `protobuf:"varint,4,opt,name=is_kill,json=isKill,proto3" json:"is_kill,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -102,6 +103,13 @@ func (x *Command) ProtoReflect() protoreflect.Message {
 // Deprecated: Use Command.ProtoReflect.Descriptor instead.
 func (*Command) Descriptor() ([]byte, []int) {
 	return file_implant_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Command) GetImplantId() string {
+	if x != nil {
+		return x.ImplantId
+	}
+	return ""
 }
 
 func (x *Command) GetIn() string {
@@ -323,11 +331,13 @@ const file_implant_proto_rawDesc = "" +
 	"\n" +
 	"\rimplant.proto\x12\agrpcapi\"\x1f\n" +
 	"\rDeleteRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"D\n" +
-	"\aCommand\x12\x0e\n" +
-	"\x02in\x18\x01 \x01(\tR\x02in\x12\x10\n" +
-	"\x03out\x18\x02 \x01(\tR\x03out\x12\x17\n" +
-	"\ais_kill\x18\x03 \x01(\bR\x06isKill\"\a\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"c\n" +
+	"\aCommand\x12\x1d\n" +
+	"\n" +
+	"implant_id\x18\x01 \x01(\tR\timplantId\x12\x0e\n" +
+	"\x02in\x18\x02 \x01(\tR\x02in\x12\x10\n" +
+	"\x03out\x18\x03 \x01(\tR\x03out\x12\x17\n" +
+	"\ais_kill\x18\x04 \x01(\bR\x06isKill\"\a\n" +
 	"\x05Empty\"q\n" +
 	"\vImplantData\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +

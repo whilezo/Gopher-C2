@@ -19,9 +19,10 @@ message DeleteRequest {
 }
 
 message Command {
-    string in = 1;
-    string out = 2;
-    bool is_kill = 3;
+    string implant_id = 1;
+    string in = 2;
+    string out = 3;
+    bool is_kill = 4;
 }
 
 message Empty {}

