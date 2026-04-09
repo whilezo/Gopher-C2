@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -20,14 +21,28 @@ import (
 )
 
 const banner = `
-  ______ ___     _______   ______   
- /      |__ \   /  _____| /  __  \  
-|  ,----'  ) | |  |  __  |  |  |  | 
-|  |      / /  |  | |_ | |  |  |  | 
-|  '----./ /_  |  |__| | |  '--'  | 
- \______|____|  \______|  \______/
------------- C2 Server ------------
+   ____             _                     ____ ____  
+  / ___| ___  _ __ | |__   ___ _ __      / ___|___ \ 
+ | |  _ / _ \| '_ \| '_ \ / _ \ '__|____| |     __) |
+ | |_| | (_) | |_) | | | |  __/ | |_____| |___ / __/ 
+  \____|\___/| .__/|_| |_|\___|_|        \____|_____|
+             |_|                                     
 `
+
+const version = "v1.0.0"
+
+func printBanner() {
+	separator := "============================================================"
+
+	fmt.Println(separator)
+	fmt.Print(strings.TrimLeft(banner, "\r\n"))
+	fmt.Println(separator)
+	fmt.Printf("  BUILD DATE : %s\n", time.Now().Format("2006-01-02"))
+	fmt.Printf("  LISTENERS  : :4444 (Implant), :9090 (Admin)\n")
+	fmt.Printf("  DATABASE   : sqlite3 (server.db)\n")
+	fmt.Println(separator)
+	fmt.Println()
+}
 
 type SessionManager struct {
 	work    map[string]chan *grpcapi.Command
@@ -223,7 +238,7 @@ func main() {
 	grpcapi.RegisterImplantServer(grpcImplantServer, implant)
 	grpcapi.RegisterAdminServer(grpcAdminServer, admin)
 
-	fmt.Print(banner)
+	printBanner()
 
 	go func() {
 		grpcImplantServer.Serve(implantListener)
