@@ -86,6 +86,8 @@ func main() {
 						return err
 					}
 
+					fmt.Printf("[+] Successfully deleted implant: %s\n", id)
+
 					return nil
 				},
 			},
