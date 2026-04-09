@@ -1,3 +1,4 @@
 *.crt
 server.db
 *.key
+bin

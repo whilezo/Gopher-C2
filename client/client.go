@@ -47,7 +47,7 @@ func main() {
 						return err
 					}
 					if len(implantsList.Implants) == 0 {
-						fmt.Println("No implants")
+						fmt.Println("[!] No implants")
 						return nil
 					}
 					w := tabwriter.NewWriter(os.Stdout, 0, 8, 2, ' ', tabwriter.Debug)
