@@ -160,7 +160,12 @@ func (s *adminServer) DeleteImplant(ctx context.Context, deleteRequest *grpcapi.
 		IsKill: true,
 	}
 
-	s.sessions.work[deleteRequest.Id] <- killCmd
+	select {
+	case s.sessions.work[deleteRequest.Id] <- killCmd:
+		log.Printf("[*] Sent kill signal to active implant %s", deleteRequest.Id)
+	default:
+		log.Printf("[!] Implant %s is offline. Skipping kill signal.", deleteRequest.Id)
+	}
 
 	err := deleteImplant(s.db, deleteRequest.Id)
 	if err != nil {
