@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"crypto/tls"
@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/credentials"
 )
 
-func loadTLSServerCreds() (credentials.TransportCredentials, error) {
+func LoadTLSServerCreds() (credentials.TransportCredentials, error) {
 	serverCert, err := tls.LoadX509KeyPair("server.crt", "server.key")
 	if err != nil {
 		return nil, err

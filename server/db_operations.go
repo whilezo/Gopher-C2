@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"database/sql"
@@ -18,7 +18,7 @@ type Implant struct {
 //go:embed schema.sql
 var createTableSQL string
 
-func createTables(db *sql.DB) error {
+func CreateTables(db *sql.DB) error {
 	_, err := db.Exec(createTableSQL)
 	if err != nil {
 		return err

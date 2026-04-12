@@ -33,13 +33,13 @@ Developed as a final project following the completion of **Black Hat Go**, this 
 ### 1. Build the Components
 ```bash
 # Build the Server
-go build -o bin/server ./server
+go build -o bin/server ./cmd/server
 
 # Build the Admin Tool
-go build -o bin/admin ./client
+go build -o bin/admin ./cmd/client
 
 # Build the Implant
-go build -o bin/implant ./implant
+go build -o bin/implant ./cmd/implant
 ```
 
 ### 2. Launch the server
