@@ -32,14 +32,17 @@ Developed as a final project following the completion of **Black Hat Go**, this 
 
 ### 1. Build the Components
 ```bash
+# Build everything at once
+make build
+
 # Build the Server
-go build -o bin/server ./cmd/server
+make server
 
 # Build the Admin Tool
-go build -o bin/admin ./cmd/client
+make admin
 
 # Build the Implant
-go build -o bin/implant ./cmd/implant
+make implant
 ```
 
 ### 2. Launch the server
