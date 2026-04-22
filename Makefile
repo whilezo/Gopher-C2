@@ -1,15 +1,42 @@
 # Variables
+BIN_DIR=bin
 SERVER_NAME=server
-CLIENT_NAME=client
+ADMIN_NAME=admin
+IMPLANT_NAME=implant
+
+CERT_SERVER=server
+CERT_CLIENT=client
+
 DAYS_VALID=365
 PROTO_DIR=grpcapi
 PROTO_FILE=$(PROTO_DIR)/implant.proto
 PB_OUT=grpcapi
 
+.PHONY: all build proto cert server-cert client-cert clean help server admin implant
 
-.PHONY: all cert server-cert client-cert clean help
+## all: Compiles proto, generates certs, and builds all binaries
+all: proto cert build
 
-all: cert
+## build: Builds all project binaries (Server, Admin, Implant)
+build: server admin implant
+
+## server: Builds the C2 server binary
+server:
+	@echo "Building Server..."
+	@mkdir -p $(BIN_DIR)
+	go build -o $(BIN_DIR)/$(SERVER_NAME) ./cmd/server
+
+## admin: Builds the Admin CLI tool binary
+admin:
+	@echo "Building Admin Tool..."
+	@mkdir -p $(BIN_DIR)
+	go build -o $(BIN_DIR)/$(ADMIN_NAME) ./cmd/client
+
+## implant: Builds the Implant binary
+implant:
+	@echo "Building Implant..."
+	@mkdir -p $(BIN_DIR)
+	go build -o $(BIN_DIR)/$(IMPLANT_NAME) ./cmd/implant
 
 # Generic function to generate a self-signed certificate
 # Usage: $(call gen_cert,filename_base,common_name,extra_args)
