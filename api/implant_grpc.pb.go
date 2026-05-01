@@ -4,7 +4,7 @@
 // - protoc             v6.33.2
 // source: implant.proto
 
-package grpcapi
+package api
 
 import (
 	context "context"
@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Implant_FetchCommand_FullMethodName       = "/grpcapi.Implant/FetchCommand"
-	Implant_SendOutput_FullMethodName         = "/grpcapi.Implant/SendOutput"
-	Implant_RegisterNewImplant_FullMethodName = "/grpcapi.Implant/RegisterNewImplant"
+	Implant_FetchCommand_FullMethodName       = "/api.Implant/FetchCommand"
+	Implant_SendOutput_FullMethodName         = "/api.Implant/SendOutput"
+	Implant_RegisterNewImplant_FullMethodName = "/api.Implant/RegisterNewImplant"
 )
 
 // ImplantClient is the client API for Implant service.
@@ -176,7 +176,7 @@ func _Implant_RegisterNewImplant_Handler(srv interface{}, ctx context.Context, d
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Implant_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "grpcapi.Implant",
+	ServiceName: "api.Implant",
 	HandlerType: (*ImplantServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -197,9 +197,9 @@ var Implant_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	Admin_RunCommand_FullMethodName             = "/grpcapi.Admin/RunCommand"
-	Admin_ListRegisteredImplants_FullMethodName = "/grpcapi.Admin/ListRegisteredImplants"
-	Admin_DeleteImplant_FullMethodName          = "/grpcapi.Admin/DeleteImplant"
+	Admin_RunCommand_FullMethodName             = "/api.Admin/RunCommand"
+	Admin_ListRegisteredImplants_FullMethodName = "/api.Admin/ListRegisteredImplants"
+	Admin_DeleteImplant_FullMethodName          = "/api.Admin/DeleteImplant"
 )
 
 // AdminClient is the client API for Admin service.
@@ -354,7 +354,7 @@ func _Admin_DeleteImplant_Handler(srv interface{}, ctx context.Context, dec func
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Admin_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "grpcapi.Admin",
+	ServiceName: "api.Admin",
 	HandlerType: (*AdminServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

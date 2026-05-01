@@ -4,7 +4,7 @@
 // 	protoc        v6.33.2
 // source: implant.proto
 
-package grpcapi
+package api
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -329,7 +329,7 @@ var File_implant_proto protoreflect.FileDescriptor
 
 const file_implant_proto_rawDesc = "" +
 	"\n" +
-	"\rimplant.proto\x12\agrpcapi\"\x1f\n" +
+	"\rimplant.proto\x12\x03api\"\x1f\n" +
 	"\rDeleteRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"c\n" +
 	"\aCommand\x12\x1d\n" +
@@ -344,22 +344,26 @@ const file_implant_proto_rawDesc = "" +
 	"\n" +
 	"ip_address\x18\x02 \x01(\tR\tipAddress\x12\x1b\n" +
 	"\tlast_seen\x18\x03 \x01(\tR\blastSeen\x12\x16\n" +
-	"\x06status\x18\x04 \x01(\tR\x06status\"@\n" +
-	"\fImplantsList\x120\n" +
-	"\bimplants\x18\x01 \x03(\v2\x14.grpcapi.ImplantDataR\bimplants\"\"\n" +
+	"\x06status\x18\x04 \x01(\tR\x06status\"<\n" +
+	"\fImplantsList\x12,\n" +
+	"\bimplants\x18\x01 \x03(\v2\x10.api.ImplantDataR\bimplants\"\"\n" +
 	"\x10RegisterResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id2\xac\x01\n" +
-	"\aImplant\x120\n" +
-	"\fFetchCommand\x12\x0e.grpcapi.Empty\x1a\x10.grpcapi.Command\x12.\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id2\x94\x01\n" +
+	"\aImplant\x12(\n" +
+	"\fFetchCommand\x12\n" +
+	".api.Empty\x1a\f.api.Command\x12&\n" +
 	"\n" +
-	"SendOutput\x12\x10.grpcapi.Command\x1a\x0e.grpcapi.Empty\x12?\n" +
-	"\x12RegisterNewImplant\x12\x0e.grpcapi.Empty\x1a\x19.grpcapi.RegisterResponse2\xb3\x01\n" +
-	"\x05Admin\x120\n" +
+	"SendOutput\x12\f.api.Command\x1a\n" +
+	".api.Empty\x127\n" +
+	"\x12RegisterNewImplant\x12\n" +
+	".api.Empty\x1a\x15.api.RegisterResponse2\x9b\x01\n" +
+	"\x05Admin\x12(\n" +
 	"\n" +
-	"RunCommand\x12\x10.grpcapi.Command\x1a\x10.grpcapi.Command\x12?\n" +
-	"\x16ListRegisteredImplants\x12\x0e.grpcapi.Empty\x1a\x15.grpcapi.ImplantsList\x127\n" +
-	"\rDeleteImplant\x12\x16.grpcapi.DeleteRequest\x1a\x0e.grpcapi.EmptyB\fZ\n" +
-	"./;grpcapib\x06proto3"
+	"RunCommand\x12\f.api.Command\x1a\f.api.Command\x127\n" +
+	"\x16ListRegisteredImplants\x12\n" +
+	".api.Empty\x1a\x11.api.ImplantsList\x12/\n" +
+	"\rDeleteImplant\x12\x12.api.DeleteRequest\x1a\n" +
+	".api.EmptyB\bZ\x06./;apib\x06proto3"
 
 var (
 	file_implant_proto_rawDescOnce sync.Once
@@ -375,27 +379,27 @@ func file_implant_proto_rawDescGZIP() []byte {
 
 var file_implant_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_implant_proto_goTypes = []any{
-	(*DeleteRequest)(nil),    // 0: grpcapi.DeleteRequest
-	(*Command)(nil),          // 1: grpcapi.Command
-	(*Empty)(nil),            // 2: grpcapi.Empty
-	(*ImplantData)(nil),      // 3: grpcapi.ImplantData
-	(*ImplantsList)(nil),     // 4: grpcapi.ImplantsList
-	(*RegisterResponse)(nil), // 5: grpcapi.RegisterResponse
+	(*DeleteRequest)(nil),    // 0: api.DeleteRequest
+	(*Command)(nil),          // 1: api.Command
+	(*Empty)(nil),            // 2: api.Empty
+	(*ImplantData)(nil),      // 3: api.ImplantData
+	(*ImplantsList)(nil),     // 4: api.ImplantsList
+	(*RegisterResponse)(nil), // 5: api.RegisterResponse
 }
 var file_implant_proto_depIdxs = []int32{
-	3, // 0: grpcapi.ImplantsList.implants:type_name -> grpcapi.ImplantData
-	2, // 1: grpcapi.Implant.FetchCommand:input_type -> grpcapi.Empty
-	1, // 2: grpcapi.Implant.SendOutput:input_type -> grpcapi.Command
-	2, // 3: grpcapi.Implant.RegisterNewImplant:input_type -> grpcapi.Empty
-	1, // 4: grpcapi.Admin.RunCommand:input_type -> grpcapi.Command
-	2, // 5: grpcapi.Admin.ListRegisteredImplants:input_type -> grpcapi.Empty
-	0, // 6: grpcapi.Admin.DeleteImplant:input_type -> grpcapi.DeleteRequest
-	1, // 7: grpcapi.Implant.FetchCommand:output_type -> grpcapi.Command
-	2, // 8: grpcapi.Implant.SendOutput:output_type -> grpcapi.Empty
-	5, // 9: grpcapi.Implant.RegisterNewImplant:output_type -> grpcapi.RegisterResponse
-	1, // 10: grpcapi.Admin.RunCommand:output_type -> grpcapi.Command
-	4, // 11: grpcapi.Admin.ListRegisteredImplants:output_type -> grpcapi.ImplantsList
-	2, // 12: grpcapi.Admin.DeleteImplant:output_type -> grpcapi.Empty
+	3, // 0: api.ImplantsList.implants:type_name -> api.ImplantData
+	2, // 1: api.Implant.FetchCommand:input_type -> api.Empty
+	1, // 2: api.Implant.SendOutput:input_type -> api.Command
+	2, // 3: api.Implant.RegisterNewImplant:input_type -> api.Empty
+	1, // 4: api.Admin.RunCommand:input_type -> api.Command
+	2, // 5: api.Admin.ListRegisteredImplants:input_type -> api.Empty
+	0, // 6: api.Admin.DeleteImplant:input_type -> api.DeleteRequest
+	1, // 7: api.Implant.FetchCommand:output_type -> api.Command
+	2, // 8: api.Implant.SendOutput:output_type -> api.Empty
+	5, // 9: api.Implant.RegisterNewImplant:output_type -> api.RegisterResponse
+	1, // 10: api.Admin.RunCommand:output_type -> api.Command
+	4, // 11: api.Admin.ListRegisteredImplants:output_type -> api.ImplantsList
+	2, // 12: api.Admin.DeleteImplant:output_type -> api.Empty
 	7, // [7:13] is the sub-list for method output_type
 	1, // [1:7] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name

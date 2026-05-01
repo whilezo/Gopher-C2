@@ -1,4 +1,4 @@
-package server
+package storage
 
 import (
 	"database/sql"
@@ -26,7 +26,7 @@ func CreateTables(db *sql.DB) error {
 	return nil
 }
 
-func insertImplant(db *sql.DB, id uuid.UUID, ipAddress string, lastSeen, createdAt time.Time) error {
+func InsertImplant(db *sql.DB, id uuid.UUID, ipAddress string, lastSeen, createdAt time.Time) error {
 	_, err := db.Exec(
 		"INSERT INTO implants VALUES (?, ?, ?, ?)",
 		id, ipAddress, lastSeen, createdAt,
@@ -37,7 +37,7 @@ func insertImplant(db *sql.DB, id uuid.UUID, ipAddress string, lastSeen, created
 	return nil
 }
 
-func listImplants(db *sql.DB) ([]Implant, error) {
+func ListImplants(db *sql.DB) ([]Implant, error) {
 	implants := make([]Implant, 0)
 
 	rows, err := db.Query("SELECT id, ip_address, last_seen, created_at FROM implants")
@@ -62,7 +62,7 @@ func listImplants(db *sql.DB) ([]Implant, error) {
 	return implants, nil
 }
 
-func updateLastSeen(db *sql.DB, implantId string) error {
+func UpdateLastSeen(db *sql.DB, implantId string) error {
 	_, err := db.Exec(
 		"UPDATE implants SET last_seen = ? WHERE id = ?",
 		time.Now(), implantId,
@@ -74,7 +74,7 @@ func updateLastSeen(db *sql.DB, implantId string) error {
 	return nil
 }
 
-func deleteImplant(db *sql.DB, implantId string) error {
+func DeleteImplant(db *sql.DB, implantId string) error {
 	_, err := db.Exec(
 		"DELETE FROM implants WHERE id = ?",
 		implantId,

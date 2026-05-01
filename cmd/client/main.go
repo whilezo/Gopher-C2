@@ -1,8 +1,8 @@
 package main
 
 import (
-	"blackhatgo/c2c/client"
-	"blackhatgo/c2c/grpcapi"
+	"blackhatgo/c2c/api"
+	"blackhatgo/c2c/auth"
 	"context"
 	"fmt"
 	"log"
@@ -20,10 +20,10 @@ func main() {
 		opts        []grpc.DialOption
 		conn        *grpc.ClientConn
 		err         error
-		adminClient grpcapi.AdminClient
+		adminClient api.AdminClient
 	)
 
-	creds, err := client.LoadTLSClientCreds()
+	creds, err := auth.LoadTLSClientCreds()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -33,7 +33,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer conn.Close()
-	adminClient = grpcapi.NewAdminClient(conn)
+	adminClient = api.NewAdminClient(conn)
 	ctx := context.Background()
 
 	cmdFlags := &cli.Command{
@@ -42,7 +42,7 @@ func main() {
 				Name:  "list",
 				Usage: "List implants",
 				Action: func(ctx context.Context, c *cli.Command) error {
-					req := &grpcapi.Empty{}
+					req := &api.Empty{}
 					implantsList, err := adminClient.ListRegisteredImplants(ctx, req)
 					if err != nil {
 						return err
@@ -79,7 +79,7 @@ func main() {
 					}
 					id := c.Args().First()
 
-					deleteRequest := &grpcapi.DeleteRequest{
+					deleteRequest := &api.DeleteRequest{
 						Id: id,
 					}
 					_, err := adminClient.DeleteImplant(ctx, deleteRequest)
@@ -110,7 +110,7 @@ func main() {
 					instruction := strings.Join(c.Args().Slice()[1:], " ")
 
 					// 4. Construct the request
-					req := &grpcapi.Command{
+					req := &api.Command{
 						ImplantId: targetID,
 						In:        instruction,
 					}
@@ -138,7 +138,7 @@ func main() {
 						return fmt.Errorf("error: what command do you want to broadcast?")
 					}
 
-					list, err := adminClient.ListRegisteredImplants(ctx, &grpcapi.Empty{})
+					list, err := adminClient.ListRegisteredImplants(ctx, &api.Empty{})
 					if err != nil {
 						return err
 					}
@@ -152,7 +152,7 @@ func main() {
 						go func(implantID string) {
 							defer wg.Done()
 
-							req := &grpcapi.Command{
+							req := &api.Command{
 								ImplantId: implantID,
 								In:        instruction,
 							}
